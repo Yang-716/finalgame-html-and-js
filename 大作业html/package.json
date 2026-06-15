@@ -1,0 +1,22 @@
+{
+  "name": "chatgpt-period-final-game",
+  "version": "1.0.0",
+  "description": "ChatGPT大战期末周 - 一个有趣的大学生期末复习模拟游戏",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "game",
+    "education",
+    "web",
+    "nodejs",
+    "chatgpt"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

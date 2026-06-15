@@ -1,0 +1,762 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>星际采集员</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: #f7fbff;
+      font-family: "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      background:
+        radial-gradient(circle at 20% 15%, rgba(255, 220, 117, 0.22), transparent 26rem),
+        radial-gradient(circle at 80% 20%, rgba(101, 210, 255, 0.18), transparent 24rem),
+        linear-gradient(135deg, #172033 0%, #111827 48%, #201525 100%);
+      overflow-x: hidden;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .app {
+      width: min(1120px, calc(100% - 32px));
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 28px 0;
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .panel,
+    .game-shell {
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(12, 18, 30, 0.78);
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+      backdrop-filter: blur(18px);
+    }
+
+    .panel {
+      border-radius: 8px;
+      padding: 24px;
+    }
+
+    .brand {
+      margin-bottom: 22px;
+    }
+
+    .brand h1 {
+      margin: 0 0 10px;
+      font-size: clamp(30px, 5vw, 46px);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .brand p {
+      margin: 0;
+      color: #b7c2d8;
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .field label {
+      color: #dce7ff;
+      font-size: 14px;
+    }
+
+    .field input {
+      width: 100%;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 8px;
+      padding: 12px 13px;
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .field input:focus {
+      border-color: #68d8ff;
+      box-shadow: 0 0 0 3px rgba(104, 216, 255, 0.14);
+    }
+
+    .primary-btn,
+    .ghost-btn {
+      width: 100%;
+      min-height: 44px;
+      border: 0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.16s, opacity 0.16s, background 0.16s;
+    }
+
+    .primary-btn {
+      color: #07121e;
+      font-weight: 700;
+      background: linear-gradient(135deg, #ffe066, #69e1ff);
+    }
+
+    .ghost-btn {
+      color: #e8f2ff;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .primary-btn:hover,
+    .ghost-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .primary-btn:disabled {
+      cursor: wait;
+      opacity: 0.7;
+      transform: none;
+    }
+
+    .message {
+      min-height: 22px;
+      margin: 12px 0 0;
+      color: #ffdf70;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .profile {
+      display: none;
+      gap: 14px;
+    }
+
+    .profile.active,
+    .login.active {
+      display: grid;
+    }
+
+    .login {
+      display: none;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .stat {
+      border-radius: 8px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .stat small {
+      display: block;
+      margin-bottom: 6px;
+      color: #aebad1;
+    }
+
+    .stat strong {
+      font-size: 22px;
+    }
+
+    .tips {
+      margin: 16px 0 0;
+      padding-left: 18px;
+      color: #b7c2d8;
+      line-height: 1.8;
+      font-size: 13px;
+    }
+
+    .game-shell {
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .hud {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .hud-item {
+      min-width: 0;
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .hud-item span {
+      display: block;
+      color: #aebad1;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .hud-item strong {
+      display: block;
+      margin-top: 4px;
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .canvas-wrap {
+      position: relative;
+      aspect-ratio: 16 / 10;
+      width: 100%;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 8px;
+      background: #08101d;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      text-align: center;
+      background: rgba(5, 10, 18, 0.72);
+    }
+
+    .overlay.hidden {
+      display: none;
+    }
+
+    .overlay-box {
+      max-width: 420px;
+    }
+
+    .overlay h2 {
+      margin: 0 0 10px;
+      font-size: clamp(26px, 4vw, 42px);
+      letter-spacing: 0;
+    }
+
+    .overlay p {
+      margin: 0 0 18px;
+      color: #c7d2e8;
+      line-height: 1.7;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .controls button {
+      flex: 1;
+    }
+
+    @media (max-width: 880px) {
+      .app {
+        grid-template-columns: 1fr;
+        align-items: start;
+      }
+
+      .hud {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 520px) {
+      .app {
+        width: min(100% - 20px, 1120px);
+        padding: 10px 0;
+      }
+
+      .panel,
+      .game-shell {
+        padding: 14px;
+      }
+
+      .canvas-wrap {
+        aspect-ratio: 4 / 5;
+      }
+
+      .hud-item strong {
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <aside class="panel">
+      <section class="brand">
+        <h1>星际采集员</h1>
+        <p>登录后开始任务，驾驶飞船收集能量星，躲开陨石。后端会记录你的最高分。</p>
+      </section>
+
+      <form class="login active" id="loginForm">
+        <div class="field">
+          <label for="username">用户名</label>
+          <input id="username" name="username" maxlength="16" autocomplete="username" placeholder="例如：student" required />
+        </div>
+        <div class="field">
+          <label for="password">密码</label>
+          <input id="password" name="password" type="password" minlength="4" autocomplete="current-password" placeholder="至少 4 位" required />
+        </div>
+        <button class="primary-btn" id="loginBtn" type="submit">登录 / 注册</button>
+        <p class="message" id="loginMessage"></p>
+      </form>
+
+      <section class="profile" id="profilePanel">
+        <div class="stat-grid">
+          <div class="stat">
+            <small>玩家</small>
+            <strong id="playerName">-</strong>
+          </div>
+          <div class="stat">
+            <small>最高分</small>
+            <strong id="bestScore">0</strong>
+          </div>
+        </div>
+        <button class="ghost-btn" id="logoutBtn" type="button">退出登录</button>
+      </section>
+
+      <ul class="tips">
+        <li>WASD 或方向键移动飞船。</li>
+        <li>收集黄色能量星加分。</li>
+        <li>撞到红色陨石会扣时间。</li>
+        <li>每局结束后自动提交分数。</li>
+      </ul>
+    </aside>
+
+    <section class="game-shell">
+      <div class="hud">
+        <div class="hud-item"><span>分数</span><strong id="score">0</strong></div>
+        <div class="hud-item"><span>时间</span><strong id="time">45</strong></div>
+        <div class="hud-item"><span>等级</span><strong id="level">1</strong></div>
+        <div class="hud-item"><span>状态</span><strong id="stateText">待登录</strong></div>
+      </div>
+
+      <div class="canvas-wrap">
+        <canvas id="gameCanvas" width="960" height="600"></canvas>
+        <div class="overlay" id="overlay">
+          <div class="overlay-box">
+            <h2 id="overlayTitle">请先登录</h2>
+            <p id="overlayText">登录成功后即可开始游戏，后端接口会保存账号和最高分。</p>
+            <button class="primary-btn" id="startBtn" type="button" disabled>开始游戏</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="primary-btn" id="restartBtn" type="button" disabled>重新开始</button>
+        <button class="ghost-btn" id="pauseBtn" type="button" disabled>暂停</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const api = {
+      async request(path, options = {}) {
+        const token = localStorage.getItem("starToken");
+        const headers = { "Content-Type": "application/json", ...(options.headers || {}) };
+        if (token) headers.Authorization = `Bearer ${token}`;
+
+        const response = await fetch(path, { ...options, headers });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(data.message || "请求失败");
+        }
+        return data;
+      },
+      login(username, password) {
+        return this.request("/api/login", {
+          method: "POST",
+          body: JSON.stringify({ username, password })
+        });
+      },
+      me() {
+        return this.request("/api/me");
+      },
+      saveScore(score) {
+        return this.request("/api/score", {
+          method: "POST",
+          body: JSON.stringify({ score })
+        });
+      }
+    };
+
+    const elements = {
+      loginForm: document.querySelector("#loginForm"),
+      loginBtn: document.querySelector("#loginBtn"),
+      loginMessage: document.querySelector("#loginMessage"),
+      profilePanel: document.querySelector("#profilePanel"),
+      playerName: document.querySelector("#playerName"),
+      bestScore: document.querySelector("#bestScore"),
+      logoutBtn: document.querySelector("#logoutBtn"),
+      score: document.querySelector("#score"),
+      time: document.querySelector("#time"),
+      level: document.querySelector("#level"),
+      stateText: document.querySelector("#stateText"),
+      overlay: document.querySelector("#overlay"),
+      overlayTitle: document.querySelector("#overlayTitle"),
+      overlayText: document.querySelector("#overlayText"),
+      startBtn: document.querySelector("#startBtn"),
+      restartBtn: document.querySelector("#restartBtn"),
+      pauseBtn: document.querySelector("#pauseBtn"),
+      canvas: document.querySelector("#gameCanvas")
+    };
+
+    const ctx = elements.canvas.getContext("2d");
+    const keys = new Set();
+
+    const game = {
+      user: null,
+      running: false,
+      paused: false,
+      submitted: false,
+      score: 0,
+      time: 45,
+      level: 1,
+      lastFrame: 0,
+      nextSecond: 0,
+      player: { x: 480, y: 300, r: 18, speed: 275 },
+      stars: [],
+      meteors: [],
+      background: Array.from({ length: 100 }, () => ({
+        x: Math.random() * 960,
+        y: Math.random() * 600,
+        r: Math.random() * 1.8 + 0.4,
+        a: Math.random() * 0.65 + 0.25
+      }))
+    };
+
+    function resizeCanvas() {
+      const rect = elements.canvas.getBoundingClientRect();
+      const ratio = window.devicePixelRatio || 1;
+      elements.canvas.width = Math.floor(rect.width * ratio);
+      elements.canvas.height = Math.floor(rect.height * ratio);
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    }
+
+    function bounds() {
+      return elements.canvas.getBoundingClientRect();
+    }
+
+    function randomItem(radius) {
+      const rect = bounds();
+      return {
+        x: Math.random() * (rect.width - radius * 2) + radius,
+        y: Math.random() * (rect.height - radius * 2) + radius,
+        r: radius
+      };
+    }
+
+    function resetGame() {
+      const rect = bounds();
+      game.score = 0;
+      game.time = 45;
+      game.level = 1;
+      game.submitted = false;
+      game.player = { x: rect.width / 2, y: rect.height / 2, r: 18, speed: 275 };
+      game.stars = Array.from({ length: 6 }, () => randomItem(10));
+      game.meteors = Array.from({ length: 4 }, (_, index) => ({
+        ...randomItem(16),
+        vx: (Math.random() > 0.5 ? 1 : -1) * (90 + index * 20),
+        vy: (Math.random() > 0.5 ? 1 : -1) * (70 + index * 18)
+      }));
+      updateHud("进行中");
+    }
+
+    function startGame() {
+      if (!game.user) return;
+      resetGame();
+      game.running = true;
+      game.paused = false;
+      game.lastFrame = performance.now();
+      game.nextSecond = game.lastFrame + 1000;
+      elements.overlay.classList.add("hidden");
+      elements.restartBtn.disabled = false;
+      elements.pauseBtn.disabled = false;
+      elements.pauseBtn.textContent = "暂停";
+      requestAnimationFrame(loop);
+    }
+
+    function distance(a, b) {
+      return Math.hypot(a.x - b.x, a.y - b.y);
+    }
+
+    function updateHud(state = game.running ? "进行中" : "结束") {
+      elements.score.textContent = game.score;
+      elements.time.textContent = game.time;
+      elements.level.textContent = game.level;
+      elements.stateText.textContent = state;
+    }
+
+    function updatePlayer(delta) {
+      let dx = 0;
+      let dy = 0;
+      if (keys.has("arrowleft") || keys.has("a")) dx -= 1;
+      if (keys.has("arrowright") || keys.has("d")) dx += 1;
+      if (keys.has("arrowup") || keys.has("w")) dy -= 1;
+      if (keys.has("arrowdown") || keys.has("s")) dy += 1;
+
+      if (dx || dy) {
+        const length = Math.hypot(dx, dy);
+        game.player.x += (dx / length) * game.player.speed * delta;
+        game.player.y += (dy / length) * game.player.speed * delta;
+      }
+
+      const rect = bounds();
+      game.player.x = Math.max(game.player.r, Math.min(rect.width - game.player.r, game.player.x));
+      game.player.y = Math.max(game.player.r, Math.min(rect.height - game.player.r, game.player.y));
+    }
+
+    function updateObjects(delta) {
+      const rect = bounds();
+      game.meteors.forEach((meteor) => {
+        meteor.x += meteor.vx * delta;
+        meteor.y += meteor.vy * delta;
+        if (meteor.x < meteor.r || meteor.x > rect.width - meteor.r) meteor.vx *= -1;
+        if (meteor.y < meteor.r || meteor.y > rect.height - meteor.r) meteor.vy *= -1;
+      });
+
+      game.stars.forEach((star, index) => {
+        if (distance(game.player, star) < game.player.r + star.r) {
+          game.score += 10;
+          game.stars[index] = randomItem(10);
+          if (game.score % 50 === 0) {
+            game.level += 1;
+            game.meteors.push({
+              ...randomItem(16),
+              vx: (Math.random() > 0.5 ? 1 : -1) * (110 + game.level * 14),
+              vy: (Math.random() > 0.5 ? 1 : -1) * (90 + game.level * 12)
+            });
+          }
+        }
+      });
+
+      game.meteors.forEach((meteor) => {
+        if (!meteor.cooldown && distance(game.player, meteor) < game.player.r + meteor.r) {
+          game.time = Math.max(0, game.time - 3);
+          meteor.cooldown = 0.7;
+        }
+        meteor.cooldown = Math.max(0, (meteor.cooldown || 0) - delta);
+      });
+    }
+
+    function drawShip(x, y) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.fillStyle = "#69e1ff";
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, -22);
+      ctx.lineTo(17, 18);
+      ctx.lineTo(0, 10);
+      ctx.lineTo(-17, 18);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = "#ffe066";
+      ctx.beginPath();
+      ctx.arc(0, -3, 5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function draw() {
+      const rect = bounds();
+      ctx.clearRect(0, 0, rect.width, rect.height);
+      const gradient = ctx.createLinearGradient(0, 0, rect.width, rect.height);
+      gradient.addColorStop(0, "#091629");
+      gradient.addColorStop(1, "#1a1021");
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, rect.width, rect.height);
+
+      game.background.forEach((star) => {
+        ctx.fillStyle = `rgba(255,255,255,${star.a})`;
+        ctx.beginPath();
+        ctx.arc((star.x / 960) * rect.width, (star.y / 600) * rect.height, star.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      game.stars.forEach((star) => {
+        ctx.fillStyle = "#ffe066";
+        ctx.shadowColor = "#ffe066";
+        ctx.shadowBlur = 18;
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      });
+
+      game.meteors.forEach((meteor) => {
+        ctx.fillStyle = meteor.cooldown ? "#ffb3a8" : "#ff6b5f";
+        ctx.beginPath();
+        ctx.arc(meteor.x, meteor.y, meteor.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "rgba(255,255,255,0.35)";
+        ctx.stroke();
+      });
+
+      drawShip(game.player.x, game.player.y);
+    }
+
+    async function finishGame() {
+      game.running = false;
+      game.paused = false;
+      updateHud("已结束");
+      elements.pauseBtn.disabled = true;
+      elements.overlay.classList.remove("hidden");
+      elements.overlayTitle.textContent = "任务完成";
+      elements.overlayText.textContent = `本局得分 ${game.score}，正在保存到后端排行榜。`;
+      elements.startBtn.disabled = false;
+      elements.startBtn.textContent = "再玩一局";
+
+      if (!game.submitted) {
+        game.submitted = true;
+        try {
+          const result = await api.saveScore(game.score);
+          game.user.bestScore = result.bestScore;
+          elements.bestScore.textContent = result.bestScore;
+          elements.overlayText.textContent = `本局得分 ${game.score}，你的最高分是 ${result.bestScore}。`;
+        } catch (error) {
+          elements.overlayText.textContent = `本局得分 ${game.score}，分数保存失败：${error.message}`;
+        }
+      }
+    }
+
+    function loop(now) {
+      if (!game.running) return;
+      const delta = Math.min((now - game.lastFrame) / 1000, 0.033);
+      game.lastFrame = now;
+
+      if (!game.paused) {
+        updatePlayer(delta);
+        updateObjects(delta);
+        if (now >= game.nextSecond) {
+          game.time -= 1;
+          game.nextSecond += 1000;
+        }
+        if (game.time <= 0) {
+          game.time = 0;
+          draw();
+          finishGame();
+          return;
+        }
+        updateHud("进行中");
+      } else {
+        updateHud("暂停");
+      }
+
+      draw();
+      requestAnimationFrame(loop);
+    }
+
+    function showLoggedIn(user) {
+      game.user = user;
+      elements.loginForm.classList.remove("active");
+      elements.profilePanel.classList.add("active");
+      elements.playerName.textContent = user.username;
+      elements.bestScore.textContent = user.bestScore || 0;
+      elements.overlayTitle.textContent = "准备出发";
+      elements.overlayText.textContent = "收集能量星，避开陨石，看看你能刷新多少分。";
+      elements.overlay.classList.remove("hidden");
+      elements.startBtn.disabled = false;
+      elements.restartBtn.disabled = false;
+      updateHud("待开始");
+    }
+
+    function showLoggedOut() {
+      game.user = null;
+      game.running = false;
+      game.paused = false;
+      localStorage.removeItem("starToken");
+      elements.loginForm.classList.add("active");
+      elements.profilePanel.classList.remove("active");
+      elements.overlayTitle.textContent = "请先登录";
+      elements.overlayText.textContent = "登录成功后即可开始游戏，后端接口会保存账号和最高分。";
+      elements.overlay.classList.remove("hidden");
+      elements.startBtn.disabled = true;
+      elements.restartBtn.disabled = true;
+      elements.pauseBtn.disabled = true;
+      updateHud("待登录");
+      draw();
+    }
+
+    elements.loginForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const form = new FormData(elements.loginForm);
+      const username = String(form.get("username")).trim();
+      const password = String(form.get("password"));
+      elements.loginBtn.disabled = true;
+      elements.loginMessage.textContent = "正在连接后端...";
+      try {
+        const data = await api.login(username, password);
+        localStorage.setItem("starToken", data.token);
+        elements.loginMessage.textContent = "";
+        showLoggedIn(data.user);
+      } catch (error) {
+        elements.loginMessage.textContent = error.message;
+      } finally {
+        elements.loginBtn.disabled = false;
+      }
+    });
+
+    elements.logoutBtn.addEventListener("click", showLoggedOut);
+    elements.startBtn.addEventListener("click", startGame);
+    elements.restartBtn.addEventListener("click", startGame);
+    elements.pauseBtn.addEventListener("click", () => {
+      if (!game.running) return;
+      game.paused = !game.paused;
+      elements.pauseBtn.textContent = game.paused ? "继续" : "暂停";
+      if (!game.paused) {
+        game.lastFrame = performance.now();
+        game.nextSecond = game.lastFrame + 1000;
+      }
+    });
+
+    window.addEventListener("keydown", (event) => {
+      keys.add(event.key.toLowerCase());
+      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(event.key)) {
+        event.preventDefault();
+      }
+    });
+
+    window.addEventListener("keyup", (event) => {
+      keys.delete(event.key.toLowerCase());
+    });
+
+    window.addEventListener("resize", () => {
+      resizeCanvas();
+      draw();
+    });
+
+    resizeCanvas();
+    draw();
+
+    api.me().then((data) => {
+      showLoggedIn(data.user);
+    }).catch(() => {
+      showLoggedOut();
+    });
+  </script>
+</body>
+</html>

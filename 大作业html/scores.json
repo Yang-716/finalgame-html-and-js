@@ -1,0 +1,20 @@
+{
+  "users": [
+    {
+      "username": "摆烂小玉",
+      "passwordHash": "b9bdfe39e2f172663fba6f3c:9bd0c16d6dd23089ccc87abe30a46a20394fcc6e924eeb101ca0ae1e13636840",
+      "bestScore": 100,
+      "gameData": null,
+      "createdAt": "2026-06-14T11:14:29.100Z",
+      "lastScore": 100,
+      "updatedAt": "2026-06-15T12:19:07.395Z"
+    },
+    {
+      "username": "奋斗小于",
+      "passwordHash": "896094ab0377c72b4aed22ab:50c74bf2707ddc078a0a7f28377bd98db58e26d8cd57c64f9ce50cc4be489fa6",
+      "bestScore": 0,
+      "gameData": null,
+      "createdAt": "2026-06-15T11:11:26.097Z"
+    }
+  ]
+}

@@ -1,0 +1,2024 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ChatGPT大战期末周</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: #f7fbff;
+      font-family: "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      overflow-x: hidden;
+    }
+
+    button, input, select {
+      font: inherit;
+    }
+
+    .app {
+      width: min(95%, 1400px);
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 20px 0;
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .panel, .game-area {
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(12, 18, 30, 0.9);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+    }
+
+    .panel {
+      padding: 24px;
+      position: sticky;
+      top: 20px;
+    }
+
+    .brand {
+      margin-bottom: 20px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 24px;
+      color: #68d8ff;
+      text-shadow: 0 0 10px rgba(104, 216, 255, 0.5);
+    }
+
+    .brand p {
+      margin: 5px 0 0;
+      font-size: 12px;
+      color: #aebad1;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .field label {
+      color: #dce7ff;
+      font-size: 13px;
+    }
+
+    .field input {
+      width: 100%;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 6px;
+      padding: 10px;
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.05);
+      outline: none;
+      font-size: 14px;
+    }
+
+    .field input:focus {
+      border-color: #68d8ff;
+      box-shadow: 0 0 8px rgba(104, 216, 255, 0.3);
+    }
+
+    .primary-btn {
+      width: 100%;
+      min-height: 40px;
+      border: 0;
+      border-radius: 6px;
+      cursor: pointer;
+      background: linear-gradient(135deg, #68d8ff, #4db8ff);
+      color: #07121e;
+      font-weight: 600;
+      transition: all 0.3s;
+      font-size: 14px;
+    }
+
+    .primary-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(104, 216, 255, 0.4);
+    }
+
+    .primary-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .message {
+      margin: 10px 0 0;
+      color: #ffdf70;
+      font-size: 13px;
+      min-height: 20px;
+    }
+
+    .message.error {
+      color: #ff6b6b;
+    }
+
+    .message.success {
+      color: #51cf66;
+    }
+
+    .avatar-selector {
+      margin: 18px 0;
+      padding: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .avatar-selector .avatar-preview {
+      margin-top: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.14);
+      border-radius: 10px;
+    }
+
+    .avatar-panel {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+      padding: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .avatar-card {
+      width: 140px;
+      height: 240px;
+      position: relative;
+      margin: 0 auto;
+      background: transparent;
+      border-radius: 24px;
+      padding-top: 20px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    .avatar-head {
+      position: absolute;
+      width: 80px;
+      height: 86px;
+      top: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      pointer-events: none;
+    }
+
+    .avatar-head::after {
+      content: '';
+      position: absolute;
+      width: 34px;
+      height: 24px;
+      left: 50%;
+      bottom: -8px;
+      transform: translateX(-50%);
+      background: linear-gradient(180deg, rgba(255,229,196,0.95), rgba(206,161,125,0.92));
+      border-radius: 18px 18px 12px 12px;
+      box-shadow: inset 0 3px 6px rgba(255,255,255,0.35), inset 0 -4px 8px rgba(0,0,0,0.08);
+      z-index: 1;
+    }
+
+    .avatar-face {
+      position: absolute;
+      width: 72px;
+      height: 72px;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #ffe5c2, #f2c4a1 45%, #cea17d 100%);
+      box-shadow: inset 0 10px 20px rgba(0,0,0,0.12), 0 3px 10px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+
+    .avatar-face::before {
+      content: '';
+      position: absolute;
+      width: 46px;
+      height: 24px;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: radial-gradient(circle at 50% 20%, rgba(255,255,255,0.35), rgba(255,255,255,0));
+      opacity: 0.5;
+    }
+
+    .avatar-face::after {
+      content: '';
+      position: absolute;
+      width: 52px;
+      height: 30px;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: radial-gradient(circle at 50% 15%, rgba(255,216,180,0.6), rgba(255,216,180,0));
+      filter: blur(1px);
+      opacity: 0.8;
+    }
+
+    .avatar-hair {
+      position: absolute;
+      width: 96px;
+      height: 42px;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 60% 60% 40% 40%;
+      background: linear-gradient(180deg, #2a2a2a 0%, #141414 100%);
+      box-shadow: inset 0 10px 0 rgba(255,255,255,0.08), inset 0 -8px 14px rgba(0,0,0,0.18);
+    }
+
+    .avatar-card.hair-black .avatar-hair { background: linear-gradient(180deg, #333333 0%, #141414 100%); }
+    .avatar-card.hair-brown .avatar-hair { background: linear-gradient(180deg, #8a5f41 0%, #543721 100%); }
+    .avatar-card.hair-blonde .avatar-hair { background: linear-gradient(180deg, #f5d48d 0%, #b58b50 100%); }
+    .avatar-card.hair-pink .avatar-hair { background: linear-gradient(180deg, #ffabbf 0%, #c95789 100%); }
+    .avatar-card.hair-blue .avatar-hair { background: linear-gradient(180deg, #75c6ff 0%, #2e75b7 100%); }
+
+    .avatar-hair::after {
+      content: '';
+      position: absolute;
+      left: 10px;
+      top: 8px;
+      width: 24px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.16);
+      filter: blur(1px);
+    }
+
+    .avatar-eye {
+      position: absolute;
+      width: 12px;
+      height: 14px;
+      top: 34px;
+      border-radius: 50%;
+      background: #111;
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,0.1);
+      transition: transform 0.3s ease, height 0.3s ease;
+    }
+
+    .avatar-eye.left { left: 16px; }
+    .avatar-eye.right { right: 16px; }
+
+    .avatar-eye::after {
+      content: '';
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      top: 2px;
+      left: 2px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.9);
+    }
+
+    .avatar-mouth {
+      position: absolute;
+      width: 28px;
+      height: 18px;
+      top: 48px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: transparent;
+      overflow: hidden;
+    }
+
+    .avatar-mouth::before {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 12px;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #111;
+      border-radius: 0 0 16px 16px;
+      transition: transform 0.3s ease, background 0.3s ease;
+    }
+
+    .avatar-card.mood-0 .avatar-mouth::before { transform: translateX(-50%) rotate(180deg); background: #c24a4a; }
+    .avatar-card.mood-1 .avatar-mouth::before { transform: translateX(-50%) scaleY(0.4); background: #e6b14b; }
+    .avatar-card.mood-2 .avatar-mouth::before { transform: translateX(-50%) scaleY(1); background: #111; }
+    .avatar-card.mood-3 .avatar-mouth::before { width: 22px; border-radius: 0 0 20px 20px; background: #111; }
+
+    .avatar-card.has-blush .avatar-blush { display:block; position:absolute; width:16px; height:10px; border-radius: 50%; background: rgba(255,120,170,0.9); top: 42px; }
+    .avatar-card.has-blush .avatar-blush.left { left: 10px; }
+    .avatar-card.has-blush .avatar-blush.right { right: 10px; }
+
+    .avatar-card.has-glasses .avatar-glasses, .avatar-card.has-hat .avatar-hat { display:block; }
+
+    .avatar-card .avatar-glasses { position:absolute; top: 32px; left: 10px; width: 64px; height: 24px; border-radius: 24px; border: 2px solid rgba(255,255,255,0.9); box-shadow: 0 0 0 2px rgba(255,255,255,0.08); }
+    .avatar-card .avatar-glasses::before, .avatar-card .avatar-glasses::after { content: ''; position: absolute; width: 22px; height: 14px; border-radius: 50%; top: 4px; background: rgba(255,255,255,0.12); }
+    .avatar-card .avatar-glasses::before { left: 8px; }
+    .avatar-card .avatar-glasses::after { right: 8px; }
+
+    .avatar-card .avatar-hat { position:absolute; left: 10px; top: -4px; width: 60px; height: 22px; border-radius: 50% 50% 18px 18px; background: linear-gradient(180deg, rgba(40,40,40,0.95), rgba(10,10,10,0.95)); box-shadow: 0 6px 16px rgba(0,0,0,0.3); }
+
+    .avatar-card .avatar-glasses, .avatar-card .avatar-hat, .avatar-card .avatar-blush { display:none; }
+
+    .avatar-body {
+      position: absolute;
+      width: 100px;
+      height: 120px;
+      border-radius: 44px 44px 22px 22px;
+      top: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--avatar-color, #80c7ff);
+      box-shadow: inset 0 12px 20px rgba(255,255,255,0.2), inset 0 -10px 16px rgba(0,0,0,0.16);
+      overflow: hidden;
+      transition: background 0.3s ease, transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    .avatar-body::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 52px;
+      top: 18px;
+      left: 0;
+      background: rgba(255,255,255,0.14);
+      border-radius: 40px 40px 20px 20px;
+    }
+
+
+    .avatar-card.gender-female .avatar-body { border-radius: 46px 46px 26px 26px; }
+    .avatar-card.gender-male .avatar-body { border-radius: 40px 40px 22px 22px; }
+
+    .avatar-state-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .avatar-state-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      font-size: 13px;
+    }
+
+    .avatar-state-item span:first-child {
+      color: #aebad1;
+    }
+
+    .avatar-state-item span:last-child {
+      color: #68d8ff;
+      font-weight: 600;
+    }
+
+    .avatar-card.mood-0 .avatar-mouth { width: 20px; top: 52px; background: #ff6b6b; transform: translateX(-50%) rotate(180deg); }
+    .avatar-card.mood-1 .avatar-mouth { width: 24px; top: 52px; background: #f1c40f; transform: translateX(-50%) scaleY(0.4); }
+    .avatar-card.mood-2 .avatar-mouth { width: 24px; height: 6px; top: 52px; background: #111; transform: translateX(-50%) scaleY(1); }
+    .avatar-card.mood-3 .avatar-mouth { width: 30px; height: 8px; top: 50px; background: #111; border-radius: 0 0 20px 20px; }
+
+    .avatar-card.mood-0 .avatar-eye { height: 6px; width: 12px; border-radius: 3px; top: 36px; background: #111; }
+    .avatar-card.mood-1 .avatar-eye { opacity: 0.9; }
+    .avatar-card.mood-2 .avatar-eye { opacity: 1; }
+    .avatar-card.mood-3 .avatar-eye { box-shadow: 0 0 0 2px rgba(255,255,255,0.12); }
+
+    .avatar-card.stamina-0 .avatar-body { filter: brightness(0.75); }
+    .avatar-card.stamina-1 .avatar-body { filter: brightness(0.88); }
+    .avatar-card.stamina-2 .avatar-body { filter: brightness(1); }
+    .avatar-card.stamina-3 .avatar-body { filter: brightness(1.12); }
+
+    .avatar-card.gpa-0 { transform: scale(0.96); }
+    .avatar-card.gpa-1 { transform: scale(0.98); }
+    .avatar-card.gpa-2 { transform: scale(1); }
+    .avatar-card.gpa-3 { transform: scale(1.02); }
+
+    /* stamina and gpa visual states */
+    .avatar-card.stamina-0 { opacity: 0.5; transform-origin: center bottom; transform: translateY(6px) scale(0.96); }
+    .avatar-card.stamina-0 .avatar-body { height:90px; top:120px; }
+    .avatar-card.stamina-1 { opacity: 0.85; transform: translateY(2px) scale(0.98); }
+    .avatar-card.stamina-2 { opacity: 1; }
+    .avatar-card.stamina-3 { opacity: 1; transform: translateY(-4px); }
+
+    /* gpa poses */
+    .avatar-card.gpa-0 .avatar-head { transform: translateY(6px); }
+    .avatar-card.gpa-1 .avatar-head { transform: translateY(2px); }
+    .avatar-card.gpa-2 .avatar-head { transform: translateY(0); }
+    .avatar-card.gpa-3 .avatar-head { transform: translateY(-6px); }
+
+    /* 学霸抬手效果 */
+    .avatar-card.gpa-3 .avatar-body::after {
+      content: '';
+      position: absolute;
+      right: 6px;
+      top: -8px;
+      width: 18px;
+      height: 18px;
+      background: radial-gradient(circle at 40% 40%, #fff9c4, rgba(255,255,255,0));
+      border-radius: 50%;
+      filter: blur(4px);
+      animation: pet-twinkle 1.2s linear infinite;
+    }
+
+    .login.hidden, .profile.hidden, .game.hidden {
+      display: none;
+    }
+
+    /* 悬浮宠物容器样式 */
+    #floatingAvatarContainer {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      width: 160px;
+      height: 260px;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      touch-action: none;
+      transition: transform 0.3s ease, right 0.3s ease, bottom 0.3s ease;
+      cursor: grab;
+    }
+
+    #floatingAvatarContainer.dragging { cursor: grabbing; }
+
+    /* 轻微循环动态：晃动与眨眼 */
+    .pet-bob { animation: pet-bob 3s ease-in-out infinite; }
+    @keyframes pet-bob { 0% { transform: translateY(0); } 50% { transform: translateY(-6px); } 100% { transform: translateY(0); } }
+
+    .pet-blink .avatar-eye { animation: pet-blink 6s steps(1,end) infinite; }
+    @keyframes pet-blink { 0%,92% { transform: scaleY(1); } 95% { transform: scaleY(0.08); } 100% { transform: scaleY(1); } }
+
+    /* 活力特效和学霸星光 */
+    .pet-starry::after {
+      content: '';
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      right: -6px;
+      top: -6px;
+      background: radial-gradient(circle at 30% 30%, #fff9c4, rgba(255,255,255,0));
+      filter: blur(6px);
+      opacity: 0.95;
+      border-radius: 50%;
+      animation: pet-twinkle 1.4s linear infinite;
+    }
+    @keyframes pet-twinkle { 0% { transform: scale(0.7); opacity: 0.6 } 50% { transform: scale(1.05); opacity: 1 } 100% { transform: scale(0.7); opacity: 0.6 } }
+
+    .pet-bob-slow { animation: pet-bob 4.5s ease-in-out infinite; }
+    .pet-weak { animation: pet-weak 1.6s ease-in-out infinite; }
+    @keyframes pet-weak { 0% { transform: translateY(0) rotate(0deg);} 50% { transform: translateY(2px) rotate(-2deg);} 100% { transform: translateY(0) rotate(0deg);} }
+
+    /* 鼠标拖尾 - 通用样式 */
+    .cursor-trail {
+      position: fixed;
+      pointer-events: none;
+      font-size: 20px;
+      opacity: 1;
+      animation: trail-fade 1s ease-out forwards;
+      z-index: 9998;
+    }
+    @keyframes trail-fade {
+      0% { opacity: 1; transform: translate(0, 0) scale(1) rotate(0deg); }
+      100% { opacity: 0; transform: translate(0, -30px) scale(0.5) rotate(180deg); }
+    }
+
+    /* 粉色爱心 */
+    .cursor-heart { color: #ff7eb9; }
+
+    /* 蓝色白云 */
+    .cursor-cloud { color: #68d8ff; }
+
+    /* 橙色星星 */
+    .cursor-star { color: #ffa94d; }
+
+    /* 彩色小花 */
+    .cursor-flower { color: #51cf66; }
+
+    .profile {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .profile-info {
+      margin-bottom: 15px;
+    }
+
+    .profile-info strong {
+      display: block;
+      color: #aebad1;
+      font-size: 12px;
+      margin-bottom: 5px;
+    }
+
+    .profile-info span {
+      color: #68d8ff;
+      font-size: 16px;
+    }
+
+    .logout-btn {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: transparent;
+      color: #ff6b6b;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.3s;
+    }
+
+    .logout-btn:hover {
+      background: rgba(255, 107, 107, 0.1);
+      border-color: #ff6b6b;
+    }
+
+    .game-area {
+      padding: 24px;
+    }
+
+    .game-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .countdown {
+      font-size: 32px;
+      font-weight: bold;
+      color: #ffdf70;
+      text-shadow: 0 0 10px rgba(255, 223, 112, 0.5);
+    }
+
+    .countdown.danger {
+      color: #ff6b6b;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    .status-bars {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .status-bar {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .bar-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 13px;
+      color: #aebad1;
+    }
+
+    .bar-fill {
+      width: 100%;
+      height: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .bar-progress {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: bold;
+    }
+
+    .bar-gpa .bar-progress {
+      background: linear-gradient(90deg, #68d8ff, #4db8ff);
+      color: #07121e;
+    }
+
+    .bar-stamina .bar-progress {
+      background: linear-gradient(90deg, #51cf66, #40c057);
+      color: #07121e;
+    }
+
+    .bar-mood .bar-progress {
+      background: linear-gradient(90deg, #ff8c42, #ffa940);
+      color: #07121e;
+    }
+
+    .bar-ai .bar-progress {
+      background: linear-gradient(90deg, #c084fc, #b373f5);
+      color: #fff;
+    }
+
+    .courses {
+      margin-bottom: 20px;
+    }
+
+    .courses-title {
+      font-size: 14px;
+      color: #aebad1;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    .course-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+    }
+
+    .course-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 12px;
+    }
+
+    .course-name {
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #68d8ff;
+    }
+
+    .course-difficulty {
+      color: #ff8c42;
+      margin-bottom: 6px;
+    }
+
+    .course-bar {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .course-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #68d8ff, #4db8ff);
+      border-radius: 3px;
+      transition: width 0.3s;
+    }
+
+    .actions {
+      margin-bottom: 20px;
+    }
+
+    .actions-title {
+      font-size: 14px;
+      color: #aebad1;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    .action-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 10px;
+    }
+
+    .action-btn {
+      padding: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      color: #68d8ff;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.3s;
+      text-align: center;
+      min-height: 60px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .action-btn:hover:not(:disabled) {
+      background: rgba(104, 216, 255, 0.1);
+      border-color: #68d8ff;
+      transform: translateY(-2px);
+    }
+
+    .action-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .action-name {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .action-effect {
+      font-size: 11px;
+      color: #aebad1;
+    }
+
+    .event-log {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      padding: 12px;
+      max-height: 200px;
+      overflow-y: auto;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .log-entry {
+      margin-bottom: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .log-entry:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .log-time {
+      color: #aebad1;
+      font-size: 12px;
+    }
+
+    .log-text {
+      color: #e8f2ff;
+    }
+
+    .log-text.positive {
+      color: #51cf66;
+    }
+
+    .log-text.negative {
+      color: #ff6b6b;
+    }
+
+    .log-text.event {
+      color: #ffdf70;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal.active {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-box {
+      background: rgba(12, 18, 30, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      padding: 30px;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      text-align: center;
+    }
+
+    .modal-title {
+      font-size: 28px;
+      margin-bottom: 15px;
+      color: #68d8ff;
+    }
+
+    .modal-content {
+      color: #e8f2ff;
+      line-height: 1.8;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    .modal-result {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      padding: 15px;
+      margin-bottom: 20px;
+      font-size: 13px;
+    }
+
+    .result-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .result-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .result-label {
+      color: #aebad1;
+    }
+
+    .result-value {
+      color: #68d8ff;
+      font-weight: 600;
+    }
+
+    .result-value.positive {
+      color: #51cf66;
+    }
+
+    .result-value.negative {
+      color: #ff6b6b;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .modal-btn {
+      min-width: 120px;
+      padding: 10px 20px;
+      border: 0;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+      font-size: 14px;
+    }
+
+    .modal-btn.primary {
+      background: linear-gradient(135deg, #68d8ff, #4db8ff);
+      color: #07121e;
+    }
+
+    .modal-btn.primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(104, 216, 255, 0.4);
+    }
+
+    .ending-stars {
+      font-size: 36px;
+      margin-bottom: 15px;
+      letter-spacing: 5px;
+    }
+
+    @media (max-width: 1024px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .panel {
+        position: static;
+      }
+
+      .action-grid {
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      }
+    }
+
+    @media (max-width: 600px) {
+      .app {
+        width: 100%;
+        padding: 10px 0;
+      }
+
+      .panel, .game-area {
+        margin: 0 10px;
+        padding: 15px;
+        border-radius: 8px;
+      }
+
+      .countdown {
+        font-size: 24px;
+      }
+
+      .modal-box {
+        padding: 20px;
+      }
+
+      .modal-title {
+        font-size: 22px;
+      }
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(104, 216, 255, 0.3);
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(104, 216, 255, 0.5);
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- 左侧面板 -->
+    <div class="panel">
+      <div class="brand">
+        <h1>期末周大战</h1>
+        <p>ChatGPT助手</p>
+      </div>
+
+      <div class="login">
+        <div class="field">
+          <label>用户名</label>
+          <input id="username" type="text" placeholder="2-16位中文/英文/数字" />
+        </div>
+        <div class="field">
+          <label>密码</label>
+          <input id="password" type="password" placeholder="至少4位" />
+        </div>
+        <div class="avatar-selector">
+          <div class="field">
+            <label>选择小人物性别</label>
+            <select id="avatarGender">
+              <option value="female">女生</option>
+              <option value="male">男生</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>发色</label>
+            <select id="avatarHairColor">
+              <option value="black">黑色</option>
+              <option value="brown">棕色</option>
+              <option value="blonde">金色</option>
+              <option value="pink">粉色</option>
+              <option value="blue">蓝色</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>腮红/配饰</label>
+            <select id="avatarBlush">
+              <option value="none">无</option>
+              <option value="pink">腮红</option>
+              <option value="glasses">眼镜</option>
+              <option value="hat">小帽子</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>穿着主色</label>
+            <select id="avatarColor">
+              <option value="blue">蓝色</option>
+              <option value="green">绿色</option>
+              <option value="pink">粉色</option>
+              <option value="orange">橙色</option>
+            </select>
+          </div>
+          <div class="avatar-preview" id="loginAvatarPreview">
+            <div class="avatar-card gender-female mood-2 stamina-2 gpa-1" id="avatarPreviewCard">
+              <div class="avatar-head">
+                <div class="avatar-face"></div>
+                <div class="avatar-hair"></div>
+                <div class="avatar-eye left"></div>
+                <div class="avatar-eye right"></div>
+                <div class="avatar-mouth"></div>
+                <div class="avatar-blush left" style="display:none;"></div>
+                <div class="avatar-blush right" style="display:none;"></div>
+                <div class="avatar-glasses" style="display:none;"></div>
+                <div class="avatar-hat" style="display:none;"></div>
+              </div>
+              <div class="avatar-body"></div>
+            </div>
+          </div>
+        </div>
+        <button class="primary-btn" onclick="handleLogin()">登录/注册</button>
+        <div class="message" id="loginMsg"></div>
+      </div>
+
+      <div class="profile hidden">
+        <div class="profile-info">
+          <strong>用户</strong>
+          <span id="profileUsername"></span>
+        </div>
+        <div class="profile-info">
+          <strong>最高分</strong>
+          <span id="profileScore">0</span>
+        </div>
+        <button class="logout-btn" onclick="handleLogout()">退出登录</button>
+      </div>
+    </div>
+
+    <!-- 右侧游戏区域 -->
+    <div class="game hidden">
+      <div class="game-area">
+        <div class="game-header">
+          <div>
+            <div style="font-size: 13px; color: #aebad1; margin-bottom: 5px;">距离考试还有</div>
+            <div class="countdown" id="countdown">14 天</div>
+          </div>
+          <button class="primary-btn" onclick="handleNewGame()" style="width: auto; padding: 8px 16px; font-size: 13px;">新游戏</button>
+        </div>
+
+        <div class="avatar-panel">
+          <div class="avatar-card gender-female mood-2 stamina-2 gpa-1" id="avatarCard">
+            <div class="avatar-head">
+              <div class="avatar-face"></div>
+              <div class="avatar-hair"></div>
+              <div class="avatar-eye left"></div>
+              <div class="avatar-eye right"></div>
+              <div class="avatar-mouth"></div>
+              <div class="avatar-blush left" style="display:none;"></div>
+              <div class="avatar-blush right" style="display:none;"></div>
+              <div class="avatar-glasses" style="display:none;"></div>
+              <div class="avatar-hat" style="display:none;"></div>
+            </div>
+            <div class="avatar-body"></div>
+          </div>
+          <div>
+            <div style="font-size: 13px; color: #aebad1; margin-bottom: 10px; font-weight: 600;">你的虚拟小人物</div>
+            <div class="avatar-state-list">
+              <div class="avatar-state-item"><span>学习状态</span><span id="avatarGpaState">迷茫</span></div>
+              <div class="avatar-state-item"><span>体力状态</span><span id="avatarStaminaState">精疲力竭</span></div>
+              <div class="avatar-state-item"><span>心态状态</span><span id="avatarMoodState">心情低落</span></div>
+              <div class="avatar-state-item"><span>整体表现</span><span id="avatarOverallState">努力中</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="status-bars">
+          <div class="status-bar bar-gpa">
+            <div class="bar-label">
+              <span>学习进度 (GPA)</span>
+              <span id="gpaValue">20/100</span>
+            </div>
+            <div class="bar-fill">
+              <div class="bar-progress" id="gpaBar" style="width: 20%;"></div>
+            </div>
+          </div>
+
+          <div class="status-bar bar-stamina">
+            <div class="bar-label">
+              <span>体力值</span>
+              <span id="staminaValue">80/100</span>
+            </div>
+            <div class="bar-fill">
+              <div class="bar-progress" id="staminaBar" style="width: 80%;"></div>
+            </div>
+          </div>
+
+          <div class="status-bar bar-mood">
+            <div class="bar-label">
+              <span>心态值</span>
+              <span id="moodValue">70/100</span>
+            </div>
+            <div class="bar-fill">
+              <div class="bar-progress" id="moodBar" style="width: 70%;"></div>
+            </div>
+          </div>
+
+          <div class="status-bar bar-ai">
+            <div class="bar-label">
+              <span>AI熟练度</span>
+              <span id="aiValue">10/100</span>
+            </div>
+            <div class="bar-fill">
+              <div class="bar-progress" id="aiBar" style="width: 10%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="courses">
+          <div class="courses-title">📚 课程进度</div>
+          <div class="course-grid" id="courseGrid"></div>
+        </div>
+
+        <div class="courses">
+          <div class="courses-title">🎮 AI技能</div>
+          <div style="font-size: 13px; color: #aebad1; line-height: 1.8;" id="aiSkills">
+            等级1: 快速总结 (20点) - 学习收益提高10%<br/>
+          </div>
+        </div>
+
+        <div class="actions">
+          <div class="actions-title">⚡ 今日行动（选一个）</div>
+          <div class="action-grid" id="actionGrid"></div>
+        </div>
+
+        <div>
+          <div class="actions-title">📋 日志</div>
+          <div class="event-log" id="eventLog"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 事件弹窗 -->
+  <div class="modal" id="eventModal">
+    <div class="modal-box">
+      <div class="modal-title" id="eventTitle">随机事件</div>
+      <div class="modal-content" id="eventDescription"></div>
+      <div id="eventOptions" style="margin-bottom: 20px;"></div>
+      <div class="modal-buttons">
+        <button class="modal-btn primary" onclick="closeEventModal()">继续</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 结局弹窗 -->
+  <div class="modal" id="endingModal">
+    <div class="modal-box">
+      <div class="ending-stars" id="endingStars">★★★</div>
+      <div class="modal-title" id="endingTitle">结局标题</div>
+      <div class="modal-content" id="endingDescription"></div>
+      <div class="modal-result">
+        <div class="result-item">
+          <span class="result-label">最终GPA</span>
+          <span class="result-value" id="finalGPA">100</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">最终体力</span>
+          <span class="result-value" id="finalStamina">100</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">最终心态</span>
+          <span class="result-value" id="finalMood">100</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">AI熟练度</span>
+          <span class="result-value" id="finalAI">100</span>
+        </div>
+      </div>
+      <div class="modal-buttons">
+        <button class="modal-btn primary" onclick="handleNewGame()">再来一局</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ============ 游戏状态 ============
+    let gameState = {
+      username: '',
+      token: '',
+      day: 14,
+      gpa: 20,
+      stamina: 80,
+      mood: 70,
+      aiSkill: 10,
+      avatar: {
+        gender: 'female',
+        color: 'blue'
+      },
+      courses: {
+        database: 0,
+        python: 0,
+        dataStructure: 0,
+        dsp: 0
+      },
+      log: [],
+      gameOver: false,
+      gameStarted: false
+    };
+
+    const courseInfo = {
+      database: { name: '数据库', difficulty: '★★★', color: '#68d8ff' },
+      python: { name: 'Python程序设计', difficulty: '★★', color: '#51cf66' },
+      dataStructure: { name: '数据结构', difficulty: '★★★★', color: '#ff8c42' },
+      dsp: { name: '数字信号处理', difficulty: '★★★★★', color: '#c084fc' }
+    };
+
+    const actions = [
+      {
+        id: 'study',
+        name: '学习',
+        effect: { gpa: 8, stamina: -15, mood: -5, ai: 0 }
+      },
+      {
+        id: 'chatgpt',
+        name: '问ChatGPT',
+        effect: { gpa: 10, stamina: -5, mood: 0, ai: 5 }
+      },
+      {
+        id: 'sleep',
+        name: '睡觉',
+        effect: { gpa: 0, stamina: 20, mood: 10, ai: 0 }
+      },
+      {
+        id: 'game',
+        name: '打游戏',
+        effect: { gpa: -3, stamina: 5, mood: 15, ai: 0 }
+      },
+      {
+        id: 'video',
+        name: '刷短视频',
+        effect: { gpa: 0, stamina: -5, mood: 10, ai: 0 }
+      }
+    ];
+
+    const events = [
+      {
+        id: 'roommate',
+        title: '室友邀请你开黑',
+        description: '你的室友邀请你一起玩游戏，诱惑很大...',
+        options: [
+          { text: '拒绝', effect: { gpa: 3, stamina: 0, mood: -5, ai: 0 } },
+          { text: '加入', effect: { gpa: -5, stamina: 0, mood: 10, ai: 0 } }
+        ]
+      },
+      {
+        id: 'highlight',
+        title: '老师突然划重点',
+        description: '上课时老师突然明确指出了考试重点，太幸运了！',
+        options: [
+          { text: '记下来', effect: { gpa: 8, stamina: 0, mood: 5, ai: 0 } }
+        ]
+      },
+      {
+        id: 'video_push',
+        title: 'B站推送游戏视频',
+        description: '首页推送了你最喜欢的游戏主播的新视频...',
+        options: [
+          { text: '不看', effect: { gpa: 0, stamina: 0, mood: 0, ai: 0 } },
+          { text: '看一会', effect: { gpa: 0, stamina: -2, mood: 5, ai: 0, day: -1 } }
+        ]
+      },
+      {
+        id: 'exam_paper',
+        title: '发现历年真题',
+        description: '找到了往年的考试真题，这太宝贵了！',
+        options: [
+          { text: '开始做题', effect: { gpa: 10, stamina: -10, mood: 0, ai: 0 } }
+        ]
+      },
+      {
+        id: 'ai_down',
+        title: 'ChatGPT服务器满载',
+        description: '哎呀，ChatGPT今天服务器爆满，暂时无法使用...',
+        options: [
+          { text: '继续复习', effect: { gpa: 0, stamina: 0, mood: -5, ai: 0 } }
+        ]
+      },
+      {
+        id: 'scope_expand',
+        title: '考试范围扩大',
+        description: '老师发了新通知，考试范围扩大了！心态有点崩...',
+        options: [
+          { text: '冷静复习', effect: { gpa: 0, stamina: -5, mood: -10, ai: 0 } }
+        ]
+      },
+      {
+        id: 'notes',
+        title: '学霸同学分享笔记',
+        description: '一个学霸同学主动分享了他的复习笔记！',
+        options: [
+          { text: '感谢接受', effect: { gpa: 5, stamina: 0, mood: 5, ai: 0 } }
+        ]
+      }
+    ];
+
+    const endings = {
+      excellent: {
+        title: '保研大神',
+        description: '你提前完成复习规划，轻松通过考试，并成功获得保研资格。同学们都在问你的学习秘诀...',
+        stars: '★★★★★',
+        minGPA: 90
+      },
+      great: {
+        title: '学霸降临',
+        description: '考试成绩优秀，成为同学羡慕的对象。ChatGPT真是个好助手！',
+        stars: '★★★★',
+        minGPA: 80
+      },
+      good: {
+        title: '安全上岸',
+        description: '顺利通过考试，没有挂科。虽然不是最高分，但你已经尽力了。',
+        stars: '★★★',
+        minGPA: 60
+      },
+      barely: {
+        title: '极限飘过',
+        description: '压线及格，惊险存活。那些复习到最后一刻的日子可真刺激...',
+        stars: '★★',
+        minGPA: 50
+      },
+      failed: {
+        title: '挂科战神',
+        description: '来年再见，补考欢迎你。记取教训，下次一定要更早开始复习！',
+        stars: '★',
+        minGPA: 0
+      }
+    };
+
+    // ============ UI更新 ============
+    function updateUI() {
+      updateStatusBars();
+      updateCountdown();
+      updateCourses();
+      updateActions();
+      updateAISkills();
+      updateAvatarUI();
+    }
+
+    function updateStatusBars() {
+      const stats = [
+        { id: 'gpa', value: gameState.gpa, max: 100 },
+        { id: 'stamina', value: gameState.stamina, max: 100 },
+        { id: 'mood', value: gameState.mood, max: 100 },
+        { id: 'ai', value: gameState.aiSkill, max: 100 }
+      ];
+
+      stats.forEach(stat => {
+        const percent = (stat.value / stat.max) * 100;
+        document.getElementById(`${stat.id}Value`).textContent = `${stat.value}/${stat.max}`;
+        document.getElementById(`${stat.id}Bar`).style.width = percent + '%';
+      });
+    }
+
+    function updateCountdown() {
+      const element = document.getElementById('countdown');
+      element.textContent = `${gameState.day} 天`;
+      if (gameState.day <= 3) {
+        element.classList.add('danger');
+      } else {
+        element.classList.remove('danger');
+      }
+    }
+
+    function updateCourses() {
+      const grid = document.getElementById('courseGrid');
+      grid.innerHTML = Object.entries(gameState.courses).map(([key, value]) => {
+        const info = courseInfo[key];
+        return `
+          <div class="course-card">
+            <div class="course-name">${info.name}</div>
+            <div class="course-difficulty">${info.difficulty}</div>
+            <div class="course-bar">
+              <div class="course-bar-fill" style="width: ${value}%; background: ${info.color};"></div>
+            </div>
+            <div style="color: #aebad1; margin-top: 4px; font-size: 11px;">${value}%</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function updateActions() {
+      const grid = document.getElementById('actionGrid');
+      const disabled = gameState.gameOver;
+      grid.innerHTML = actions.map(action => {
+        const effect = action.effect;
+        let effectText = [];
+        if (effect.gpa !== 0) effectText.push(`GPA ${effect.gpa > 0 ? '+' : ''}${effect.gpa}`);
+        if (effect.stamina !== 0) effectText.push(`体力 ${effect.stamina > 0 ? '+' : ''}${effect.stamina}`);
+        if (effect.mood !== 0) effectText.push(`心态 ${effect.mood > 0 ? '+' : ''}${effect.mood}`);
+        if (effect.ai !== 0) effectText.push(`AI ${effect.ai > 0 ? '+' : ''}${effect.ai}`);
+
+        return `
+          <button class="action-btn" onclick="performAction('${action.id}')" ${disabled ? 'disabled' : ''}>
+            <div class="action-name">${action.name}</div>
+            <div class="action-effect">${effectText.join(' / ')}</div>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function updateAISkills() {
+      const levels = [
+        { min: 20, name: '快速总结', bonus: '10%' },
+        { min: 40, name: '自动生成笔记', bonus: '20%' },
+        { min: 60, name: '智能错题整理', bonus: '30%' },
+        { min: 80, name: '考试预测', bonus: '概率提前获知重点' },
+        { min: 100, name: 'AI学神模式', bonus: '所有学习效果翻倍' }
+      ];
+
+      const unlockedLevels = levels.filter(l => gameState.aiSkill >= l.min);
+      const unlocked = unlockedLevels.map(l => `✓ ${l.name} - ${l.bonus}`).join('<br/>');
+      const nextLevel = levels.find(l => gameState.aiSkill < l.min);
+      const nextText = nextLevel ? `<br/>下一个解锁: ${nextLevel.name} (需要${nextLevel.min}点)` : '';
+
+      document.getElementById('aiSkills').innerHTML = unlocked + nextText;
+    }
+
+    // ============ 游戏逻辑 ============
+    function performAction(actionId) {
+      if (gameState.gameOver || !gameState.gameStarted) return;
+
+      const action = actions.find(a => a.id === actionId);
+      if (!action) return;
+
+      const effect = action.effect;
+      gameState.gpa = Math.max(0, Math.min(100, gameState.gpa + effect.gpa));
+      gameState.stamina = Math.max(0, Math.min(100, gameState.stamina + effect.stamina));
+      gameState.mood = Math.max(0, Math.min(100, gameState.mood + effect.mood));
+      gameState.aiSkill = Math.max(0, Math.min(100, gameState.aiSkill + effect.ai));
+
+      // 分配课程进度（简化处理）
+      if (effect.gpa > 0) {
+        const courses = Object.keys(gameState.courses);
+        courses.forEach(course => {
+          gameState.courses[course] += Math.floor(effect.gpa / 2);
+        });
+      }
+
+      addLog(`执行了"${action.name}"行动`, 'action');
+      addLog(`GPA: ${effect.gpa > 0 ? '+' : ''}${effect.gpa}, 体力: ${effect.stamina}, 心态: ${effect.mood}, AI: ${effect.ai}`, 'effect');
+
+      // 随机事件 (30%概率)
+      if (Math.random() < 0.3) {
+        setTimeout(() => triggerRandomEvent(), 500);
+      } else {
+        advanceDay();
+      }
+
+      updateUI();
+    }
+
+    function triggerRandomEvent() {
+      const event = events[Math.floor(Math.random() * events.length)];
+      showEventModal(event);
+    }
+
+    function showEventModal(event) {
+      document.getElementById('eventTitle').textContent = event.title;
+      document.getElementById('eventDescription').textContent = event.description;
+
+      const optionsDiv = document.getElementById('eventOptions');
+      optionsDiv.innerHTML = event.options.map((option, idx) => `
+        <button class="action-btn" style="width: 100%; margin-bottom: 10px;" onclick="selectEventOption('${event.id}', ${idx})">
+          ${option.text}
+        </button>
+      `).join('');
+
+      if (event.options.length === 1) {
+        optionsDiv.style.display = 'none';
+        document.getElementById('eventModal').querySelector('.modal-buttons').innerHTML =
+          '<button class="modal-btn primary" onclick="closeEventModal()">继续</button>';
+      }
+
+      document.getElementById('eventModal').classList.add('active');
+    }
+
+    function selectEventOption(eventId, optionIdx) {
+      const event = events.find(e => e.id === eventId);
+      const option = event.options[optionIdx];
+      const effect = option.effect;
+
+      gameState.gpa = Math.max(0, Math.min(100, gameState.gpa + (effect.gpa || 0)));
+      gameState.stamina = Math.max(0, Math.min(100, gameState.stamina + (effect.stamina || 0)));
+      gameState.mood = Math.max(0, Math.min(100, gameState.mood + (effect.mood || 0)));
+      gameState.aiSkill = Math.max(0, Math.min(100, gameState.aiSkill + (effect.ai || 0)));
+
+      addLog(`事件选择: ${option.text}`, 'event');
+      if (effect.gpa !== 0 || effect.stamina !== 0 || effect.mood !== 0 || effect.ai !== 0) {
+        addLog(`获得: ${[
+          effect.gpa > 0 ? `GPA +${effect.gpa}` : '',
+          effect.stamina > 0 ? `体力 +${effect.stamina}` : '',
+          effect.mood > 0 ? `心态 +${effect.mood}` : '',
+          effect.ai > 0 ? `AI +${effect.ai}` : ''
+        ].filter(x => x).join(', ')}`, 'positive');
+      }
+
+      closeEventModal();
+      advanceDay();
+      updateUI();
+    }
+
+    function closeEventModal() {
+      document.getElementById('eventModal').classList.remove('active');
+    }
+
+    function advanceDay() {
+      gameState.day--;
+      addLog(`天数推进，还剩 ${gameState.day} 天`, 'log');
+
+      if (gameState.day <= 0) {
+        endGame();
+      }
+    }
+
+    function endGame() {
+      gameState.gameOver = true;
+      saveScore();
+      showEnding();
+    }
+
+    function showEnding() {
+      const gpa = gameState.gpa;
+      let ending;
+
+      if (gpa >= 90) ending = endings.excellent;
+      else if (gpa >= 80) ending = endings.great;
+      else if (gpa >= 60) ending = endings.good;
+      else if (gpa >= 50) ending = endings.barely;
+      else ending = endings.failed;
+
+      document.getElementById('endingStars').textContent = ending.stars;
+      document.getElementById('endingTitle').textContent = ending.title;
+      document.getElementById('endingDescription').textContent = ending.description;
+      document.getElementById('finalGPA').textContent = gpa;
+      document.getElementById('finalStamina').textContent = gameState.stamina;
+      document.getElementById('finalMood').textContent = gameState.mood;
+      document.getElementById('finalAI').textContent = gameState.aiSkill;
+
+      document.getElementById('endingModal').classList.add('active');
+    }
+
+    function addLog(text, type = 'log') {
+      const log = document.getElementById('eventLog');
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      const now = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+
+      let textClass = 'log-text';
+      if (type === 'positive') textClass += ' positive';
+      else if (type === 'negative') textClass += ' negative';
+      else if (type === 'event') textClass += ' event';
+
+      entry.innerHTML = `<span class="log-time">[${now}]</span> <span class="${textClass}">${text}</span>`;
+      log.insertBefore(entry, log.firstChild);
+
+      if (log.children.length > 20) {
+        log.removeChild(log.lastChild);
+      }
+    }
+
+    // ============ 登录 ============
+    async function handleLogin() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const msgEl = document.getElementById('loginMsg');
+
+      if (!username || !password) {
+        msgEl.className = 'message error';
+        msgEl.textContent = '请输入用户名和密码';
+        return;
+      }
+
+      msgEl.textContent = '登录中...';
+      msgEl.className = 'message';
+
+      try {
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          msgEl.className = 'message error';
+          msgEl.textContent = data.message || '登录失败';
+          return;
+        }
+
+        gameState.username = data.user.username;
+        gameState.token = data.token;
+
+        localStorage.setItem('gameToken', data.token);
+        localStorage.setItem('gameUsername', data.user.username);
+
+        msgEl.className = 'message success';
+        msgEl.textContent = '登录成功！';
+
+        setTimeout(() => {
+          showGameUI();
+        }, 500);
+      } catch (error) {
+        msgEl.className = 'message error';
+        msgEl.textContent = '网络错误: ' + error.message;
+      }
+    }
+
+    function handleLogout() {
+      gameState.username = '';
+      gameState.token = '';
+      localStorage.removeItem('gameToken');
+      localStorage.removeItem('gameUsername');
+      showLoginUI();
+    }
+
+    function showLoginUI() {
+      document.querySelector('.login').classList.remove('hidden');
+      document.querySelector('.profile').classList.add('hidden');
+      document.querySelector('.game').classList.add('hidden');
+      document.getElementById('username').value = '';
+      document.getElementById('password').value = '';
+    }
+
+    function showGameUI() {
+      document.querySelector('.login').classList.add('hidden');
+      document.querySelector('.profile').classList.remove('hidden');
+      document.getElementById('profileUsername').textContent = gameState.username;
+      document.querySelector('.game').classList.remove('hidden');
+      handleNewGame();
+    }
+
+    function handleAvatarSelection() {
+      gameState.avatar.gender = document.getElementById('avatarGender').value;
+      gameState.avatar.color = document.getElementById('avatarColor').value;
+      gameState.avatar.hair = document.getElementById('avatarHairColor').value;
+      gameState.avatar.blush = document.getElementById('avatarBlush').value;
+      saveAvatarPreferences();
+      updateAvatarPreview();
+      updateAvatarUI();
+    }
+
+    function loadAvatarPreferences() {
+      const storedGender = localStorage.getItem('avatarGender');
+      const storedColor = localStorage.getItem('avatarColor');
+      if (storedGender) gameState.avatar.gender = storedGender;
+      if (storedColor) gameState.avatar.color = storedColor;
+      const storedHair = localStorage.getItem('avatarHairColor');
+      const storedBlush = localStorage.getItem('avatarBlush');
+      if (storedHair) gameState.avatar.hair = storedHair;
+      if (storedBlush) gameState.avatar.blush = storedBlush;
+      document.getElementById('avatarGender').value = gameState.avatar.gender;
+      document.getElementById('avatarColor').value = gameState.avatar.color;
+      document.getElementById('avatarHairColor').value = gameState.avatar.hair || 'black';
+      document.getElementById('avatarBlush').value = gameState.avatar.blush || 'none';
+      updateAvatarPreview();
+      // attach change listeners so selection updates preview immediately
+      ['avatarGender','avatarColor','avatarHairColor','avatarBlush'].forEach(id=>{
+        const el = document.getElementById(id);
+        if (el && !el._hasAvatarListener) {
+          el.addEventListener('change', handleAvatarSelection);
+          el._hasAvatarListener = true;
+        }
+      });
+    }
+
+    function saveAvatarPreferences() {
+      localStorage.setItem('avatarGender', gameState.avatar.gender);
+      localStorage.setItem('avatarColor', gameState.avatar.color);
+      localStorage.setItem('avatarHairColor', gameState.avatar.hair);
+      localStorage.setItem('avatarBlush', gameState.avatar.blush);
+    }
+
+    function getStatLevel(value) {
+      if (value >= 81) return 3;
+      if (value >= 51) return 2;
+      if (value >= 21) return 1;
+      return 0;
+    }
+
+    function getStateLabel(type, level) {
+      const labels = {
+        gpa: ['迷茫', '有进展', '稳步提升', '学霸气场'],
+        stamina: ['精疲力竭', '有点疲惫', '状态不错', '精力充沛'],
+        mood: ['心情低落', '心态平稳', '心情愉快', '精神满满']
+      };
+      return labels[type][level];
+    }
+
+    function getOverallLabel(gpaLevel, staminaLevel, moodLevel) {
+      const average = Math.round((gpaLevel + staminaLevel + moodLevel) / 3);
+      const labels = ['坚持中', '继续加油', '状态良好', '冲刺学霸'];
+      return labels[average];
+    }
+
+    function updateAvatarPreview() {
+      const previewCard = document.getElementById('avatarPreviewCard');
+      const gpaLevel = getStatLevel(gameState.gpa);
+      const staminaLevel = getStatLevel(gameState.stamina);
+      previewCard.className = `avatar-card gender-${gameState.avatar.gender} hair-${gameState.avatar.hair || 'black'} mood-${getStatLevel(gameState.mood)} stamina-${staminaLevel} gpa-${gpaLevel}`;
+      previewCard.style.setProperty('--avatar-color', getAvatarColor(gameState.avatar.color || 'blue'));
+      // blush
+      const accessory = gameState.avatar.blush || 'none';
+      const blushEls = previewCard.querySelectorAll('.avatar-blush');
+      const glassesEl = previewCard.querySelector('.avatar-glasses');
+      const hatEl = previewCard.querySelector('.avatar-hat');
+      previewCard.classList.remove('has-blush','has-glasses','has-hat');
+      if (accessory === 'pink') {
+        previewCard.classList.add('has-blush');
+        blushEls.forEach(el => el.style.display='block');
+        if (glassesEl) glassesEl.style.display='none';
+        if (hatEl) hatEl.style.display='none';
+      } else if (accessory === 'glasses') {
+        previewCard.classList.add('has-glasses');
+        if (glassesEl) glassesEl.style.display='block';
+        blushEls.forEach(el => el.style.display='none');
+        if (hatEl) hatEl.style.display='none';
+      } else if (accessory === 'hat') {
+        previewCard.classList.add('has-hat');
+        if (hatEl) hatEl.style.display='block';
+        blushEls.forEach(el => el.style.display='none');
+        if (glassesEl) glassesEl.style.display='none';
+      } else {
+        blushEls.forEach(el => el.style.display='none');
+        if (glassesEl) glassesEl.style.display='none';
+        if (hatEl) hatEl.style.display='none';
+      }
+      // add looping animations to preview (blink and bob/weak depending on stamina)
+      previewCard.classList.remove('pet-bob','pet-bob-slow','pet-weak','pet-blink');
+      if (staminaLevel === 0) previewCard.classList.add('pet-weak');
+      else if (staminaLevel === 1) previewCard.classList.add('pet-bob-slow');
+      else previewCard.classList.add('pet-bob');
+      previewCard.classList.add('pet-blink');
+    }
+
+    function getAvatarColor(colorKey) {
+      return {
+        blue: '#68d8ff',
+        green: '#51cf66',
+        pink: '#ff7eb9',
+        orange: '#ffa94d'
+      }[colorKey] || '#68d8ff';
+    }
+
+    // ======= 悬浮宠物命名空间 Pet =======
+    const Pet = (function(){
+      const containerId = 'floatingAvatarContainer';
+      let container, avatarEl;
+      let dragging = false, offset = {x:0,y:0};
+
+      function create() {
+        container = document.createElement('div');
+        container.id = containerId;
+        container.innerHTML = `
+          <div id="petInner" style="position:relative; width:140px; height:220px;">
+            <div class="avatar-card gender-${gameState.avatar.gender} hair-${gameState.avatar.hair || 'black'}" id="petAvatar">
+              <div class="avatar-head">
+                <div class="avatar-face"></div>
+                <div class="avatar-hair"></div>
+                <div class="avatar-eye left"></div>
+                <div class="avatar-eye right"></div>
+                <div class="avatar-mouth"></div>
+                <div class="avatar-blush left" style="display:none;"></div>
+                <div class="avatar-blush right" style="display:none;"></div>
+                <div class="avatar-glasses" style="display:none;"></div>
+                <div class="avatar-hat" style="display:none;"></div>
+              </div>
+              <div class="avatar-body"></div>
+            </div>
+          </div>`;
+        document.body.appendChild(container);
+        avatarEl = document.getElementById('petAvatar');
+        container.classList.add('pet-bob','pet-blink');
+        bindEvents();
+        update();
+      }
+
+      function bindEvents(){
+        container.addEventListener('pointerdown', startDrag);
+        window.addEventListener('pointermove', onDrag);
+        window.addEventListener('pointerup', endDrag);
+        container.addEventListener('click', onClick);
+      }
+
+      function startDrag(e){
+        dragging = true;
+        container.classList.add('dragging');
+        offset.x = e.clientX - container.getBoundingClientRect().left;
+        offset.y = e.clientY - container.getBoundingClientRect().top;
+        container.setPointerCapture(e.pointerId);
+      }
+
+      function onDrag(e){
+        if (!dragging) return;
+        let x = e.clientX - offset.x;
+        let y = e.clientY - offset.y;
+        // clamp to viewport
+        x = Math.max(8, Math.min(window.innerWidth - container.offsetWidth - 8, x));
+        y = Math.max(8, Math.min(window.innerHeight - container.offsetHeight - 8, y));
+        container.style.left = x + 'px';
+        container.style.top = y + 'px';
+        container.style.right = 'auto';
+        container.style.bottom = 'auto';
+      }
+
+      function endDrag(e){
+        if (!dragging) return;
+        dragging = false;
+        container.classList.remove('dragging');
+        try { container.releasePointerCapture(e.pointerId); } catch(e){}
+      }
+
+      function onClick(e){
+        // prevent drag click
+        if (dragging) return;
+        // show small modal with stats and small restore
+        const modal = document.createElement('div');
+        modal.style.position = 'fixed';
+        modal.style.right = (window.innerWidth - container.getBoundingClientRect().right + 10) + 'px';
+        modal.style.bottom = (window.innerHeight - container.getBoundingClientRect().bottom + 10) + 'px';
+        modal.style.background = 'rgba(12,18,30,0.95)';
+        modal.style.border = '1px solid rgba(255,255,255,0.12)';
+        modal.style.padding = '12px';
+        modal.style.borderRadius = '8px';
+        modal.style.zIndex = 10001;
+        modal.innerHTML = `<div style="color:#aebad1;font-size:13px;margin-bottom:6px;">当前状态</div>
+          <div style="color:#68d8ff;font-weight:600">GPA: ${gameState.gpa}</div>
+          <div style="color:#51cf66;font-weight:600">体力: ${gameState.stamina}</div>
+          <div style="margin-top:8px;"><button class="primary-btn" id="petRestoreBtn">恢复少量体力</button></div>`;
+        document.body.appendChild(modal);
+        document.getElementById('petRestoreBtn').addEventListener('click', ()=>{
+          gameState.stamina = Math.min(100, gameState.stamina + 6);
+          addLog('宠物互动：恢复体力 +6', 'positive');
+          updateUI();
+        });
+        setTimeout(()=> modal.remove(), 3500);
+      }
+
+      function update(){
+        if (!avatarEl) avatarEl = document.getElementById('petAvatar');
+        const gpaLevel = getStatLevel(gameState.gpa);
+        const staminaLevel = getStatLevel(gameState.stamina);
+        avatarEl.className = `avatar-card gender-${gameState.avatar.gender} hair-${gameState.avatar.hair || 'black'} mood-${getStatLevel(gameState.mood)} stamina-${staminaLevel} gpa-${gpaLevel}`;
+        avatarEl.style.setProperty('--avatar-color', getAvatarColor(gameState.avatar.color || 'blue'));
+        // apply special effects per spec
+        container.classList.toggle('pet-starry', staminaLevel === 3 || gpaLevel === 3);
+        // bob / weak animations
+        container.classList.remove('pet-bob','pet-bob-slow','pet-weak');
+        if (staminaLevel === 0) container.classList.add('pet-weak');
+        else if (staminaLevel === 1) container.classList.add('pet-bob-slow');
+        else container.classList.add('pet-bob');
+        // accessories
+        const acc = gameState.avatar.blush || 'none';
+        avatarEl.classList.remove('has-blush','has-glasses','has-hat');
+        const blushEls = avatarEl.querySelectorAll('.avatar-blush');
+        const glassesEl = avatarEl.querySelector('.avatar-glasses');
+        const hatEl = avatarEl.querySelector('.avatar-hat');
+        if (acc === 'pink') {
+          avatarEl.classList.add('has-blush');
+          blushEls.forEach(el => el.style.display='block');
+          if (glassesEl) glassesEl.style.display='none';
+          if (hatEl) hatEl.style.display='none';
+        } else if (acc === 'glasses') {
+          avatarEl.classList.add('has-glasses');
+          if (glassesEl) glassesEl.style.display='block';
+          blushEls.forEach(el => el.style.display='none');
+          if (hatEl) hatEl.style.display='none';
+        } else if (acc === 'hat') {
+          avatarEl.classList.add('has-hat');
+          if (hatEl) hatEl.style.display='block';
+          blushEls.forEach(el => el.style.display='none');
+          if (glassesEl) glassesEl.style.display='none';
+        } else {
+          blushEls.forEach(el => el.style.display='none');
+          if (glassesEl) glassesEl.style.display='none';
+          if (hatEl) hatEl.style.display='none';
+        }
+      }
+
+      return { create, update };
+    })();
+
+    // expose globally
+    window.Pet = Pet;
+
+    // create pet after DOM ready
+    window.addEventListener('load', ()=>{
+      setTimeout(()=>{ try{ Pet.create(); }catch(e){console.error(e);} }, 200);
+    });
+
+    function updateAvatarUI() {
+      const avatarCard = document.getElementById('avatarCard');
+      const gpaLevel = getStatLevel(gameState.gpa);
+      const staminaLevel = getStatLevel(gameState.stamina);
+      const moodLevel = getStatLevel(gameState.mood);
+      // apply appearance and state classes
+      avatarCard.className = `avatar-card gender-${gameState.avatar.gender} hair-${gameState.avatar.hair || 'black'} mood-${moodLevel} stamina-${staminaLevel} gpa-${gpaLevel}`;
+      avatarCard.style.setProperty('--avatar-color', getAvatarColor(gameState.avatar.color || 'blue'));
+      // accessory handling: blush / glasses / hat
+      const accessory = gameState.avatar.blush || 'none';
+      avatarCard.classList.remove('has-blush','has-glasses','has-hat');
+      if (accessory === 'pink') avatarCard.classList.add('has-blush');
+      else if (accessory === 'glasses') avatarCard.classList.add('has-glasses');
+      else if (accessory === 'hat') avatarCard.classList.add('has-hat');
+      // dynamic pet effects
+      avatarCard.classList.remove('pet-starry', 'pet-bob', 'pet-blink');
+      // stamina-driven animation
+      if (staminaLevel === 0) avatarCard.classList.add('pet-bob');
+      else if (staminaLevel === 3) avatarCard.classList.add('pet-bob');
+      // blink always
+      avatarCard.classList.add('pet-blink');
+      // gpa-driven star
+      if (gpaLevel === 3) avatarCard.classList.add('pet-starry');
+      document.getElementById('avatarGpaState').textContent = getStateLabel('gpa', gpaLevel);
+      document.getElementById('avatarStaminaState').textContent = getStateLabel('stamina', staminaLevel);
+      document.getElementById('avatarMoodState').textContent = getStateLabel('mood', moodLevel);
+      document.getElementById('avatarOverallState').textContent = getOverallLabel(gpaLevel, staminaLevel, moodLevel);
+      // update floating pet if present
+      try { if (window.Pet && typeof window.Pet.update === 'function') window.Pet.update(); } catch(e){}
+    }
+
+    // ============ 游戏初始化 ============
+    function handleNewGame() {
+      gameState = {
+        username: gameState.username,
+        token: gameState.token,
+        day: 14,
+        gpa: 20,
+        stamina: 80,
+        mood: 70,
+        aiSkill: 10,
+        avatar: gameState.avatar,
+        courses: {
+          database: 0,
+          python: 0,
+          dataStructure: 0,
+          dsp: 0
+        },
+        log: [],
+        gameOver: false,
+        gameStarted: true
+      };
+
+      document.getElementById('eventLog').innerHTML = '';
+      document.getElementById('endingModal').classList.remove('active');
+      addLog('新游戏开始！14天的期末周大战开始了！', 'event');
+      updateUI();
+    }
+
+    async function saveScore() {
+      if (!gameState.token) return;
+
+      try {
+        await fetch('/api/score', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${gameState.token}`
+          },
+          body: JSON.stringify({ score: gameState.gpa })
+        });
+      } catch (error) {
+        console.error('Failed to save score:', error);
+      }
+    }
+
+    // ============ 页面加载 ============
+    window.addEventListener('load', () => {
+      const token = localStorage.getItem('gameToken');
+      const username = localStorage.getItem('gameUsername');
+
+      loadAvatarPreferences();
+      if (token && username) {
+        gameState.token = token;
+        gameState.username = username;
+        showGameUI();
+      } else {
+        showLoginUI();
+      }
+
+      // 鼠标拖尾特效 - 根据颜色显示不同样式
+      const trailConfig = {
+        pink: { className: 'cursor-heart', symbol: '♥' },
+        blue: { className: 'cursor-cloud', symbol: '☁' },
+        orange: { className: 'cursor-star', symbol: '★' },
+        green: { className: 'cursor-flower', symbol: '✿' }
+      };
+
+      document.addEventListener('mousemove', (e) => {
+        if (Math.random() > 0.7) { // 30% 的概率生成拖尾
+          const color = gameState.avatar.color || 'blue';
+          const config = trailConfig[color] || trailConfig.blue;
+          
+          const trail = document.createElement('div');
+          trail.className = 'cursor-trail ' + config.className;
+          trail.textContent = config.symbol;
+          trail.style.left = (e.clientX + (Math.random() - 0.5) * 10) + 'px';
+          trail.style.top = (e.clientY + (Math.random() - 0.5) * 10) + 'px';
+          document.body.appendChild(trail);
+          
+          // 1s 后移除元素
+          setTimeout(() => trail.remove(), 1000);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "users": [
+    {
+      "username": "yang",
+      "passwordHash": "a94c2f2536becb8ce4a73cb7:6178fca6759175525e2add6f8cc703626f43fa9c4434d9bd13732c4ce29540c3",
+      "bestScore": 100,
+      "createdAt": "2026-06-14T09:35:21.911Z",
+      "lastScore": 20,
+      "updatedAt": "2026-06-14T10:10:07.371Z"
+    }
+  ]
+}
